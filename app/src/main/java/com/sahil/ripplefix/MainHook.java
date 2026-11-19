@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -19,17 +20,34 @@ public class MainHook implements IXposedHookLoadPackage {
     private static long sLastRippleTime = 0;
     private static final Point SENSOR_POINT = new Point(1080, 1025);
 
+    private static boolean isFixEnabled(String key, boolean defaultValue) {
+        try {
+            XSharedPreferences prefs = new XSharedPreferences("com.sahil.ripplefix", HomeActivity.PREFS_NAME);
+            prefs.makeWorldReadable();
+            prefs.reload();
+            return prefs.getBoolean(key, defaultValue);
+        } catch (Throwable ignored) {
+            return defaultValue;
+        }
+    }
+
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         if (!lpparam.packageName.equals("com.android.systemui")) return;
 
+        if (isFixEnabled(HomeActivity.KEY_FP_RIPPLE, true)) {
+            hookRippleFix(lpparam.classLoader);
+        }
+    }
+
+    private void hookRippleFix(ClassLoader cl) {
         Class<?> rippleCtrlClass = XposedHelpers.findClassIfExists(
-                "com.android.systemui.biometrics.AuthRippleController", lpparam.classLoader);
+                "com.android.systemui.biometrics.AuthRippleController", cl);
         if (rippleCtrlClass == null) return;
 
         try {
             Class<?> bioTypeClass = XposedHelpers.findClass(
-                    "android.hardware.biometrics.BiometricSourceType", lpparam.classLoader);
+                    "android.hardware.biometrics.BiometricSourceType", cl);
             sFpSourceType = Enum.valueOf((Class<Enum>) bioTypeClass, "FINGERPRINT");
         } catch (Throwable ignored) {}
 
@@ -74,7 +92,7 @@ public class MainHook implements IXposedHookLoadPackage {
         });
 
         Class<?> kumClass = XposedHelpers.findClassIfExists(
-                "com.android.keyguard.KeyguardUpdateMonitor", lpparam.classLoader);
+                "com.android.keyguard.KeyguardUpdateMonitor", cl);
         if (kumClass != null) {
             XposedBridge.hookAllMethods(kumClass, "onFingerprintAuthenticated", new XC_MethodHook() {
                 @Override
