@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EvoTempFix</string>
+    <string name="xposeddescription">Temporary SystemUI fixes for Evolution X 12.3 on POCO F5 (marble)</string>
+</resources>
