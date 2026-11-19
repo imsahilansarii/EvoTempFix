@@ -14,7 +14,7 @@
 - **450ms Debounce Guard:** Prevents duplicate ripple triggers.
 
 ## 📦 Installation
-1. Download and install **`MarbleRippleFix-v2.8.apk`** from [Releases](../../releases).
+1. Download and install **`EvoTempFix-v2.8.apk`** from [Releases](../../releases).
 2. Enable the module in **Vector / LSPosed** (Scope: `System UI`).
 3. Restart SystemUI (`su -c "killall com.android.systemui"`).
 

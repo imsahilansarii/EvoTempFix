@@ -44,7 +44,7 @@ jobs:
       - name: Prepare APK
         run: |
           APK_PATH=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
-          cp "$APK_PATH" MarbleRippleFix-v2.8.apk
+          cp "$APK_PATH" EvoTempFix-v2.8.apk
 
       - name: Send APK to Telegram
         env:
@@ -53,9 +53,9 @@ jobs:
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
           curl -s -F chat_id="$CHAT_ID" \
-               -F document=@"MarbleRippleFix-v2.8.apk" \
+               -F document=@"EvoTempFix-v2.8.apk" \
                -F parse_mode="Markdown" \
-               -F caption="✅ *MarbleRippleFix v2.8 Ready!*
+               -F caption="✅ *EvoTempFix v2.8 Ready!*
           📝 *Commit:* \`$COMMIT_MSG\`" \
                "https://api.telegram.org/bot$BOT_TOKEN/sendDocument"
 
@@ -63,5 +63,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: MarbleRippleFix-v2.8.apk
+          files: EvoTempFix-v2.8.apk
           generate_release_notes: true

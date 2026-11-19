@@ -13,5 +13,5 @@ dependencyResolutionManagement {
         maven { url 'https://api.xposed.info/' }
     }
 }
-rootProject.name = "MarbleRippleFix"
+rootProject.name = "EvoTempFix"
 include ':app'
