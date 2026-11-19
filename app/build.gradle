@@ -18,7 +18,7 @@ android {
         fixed {
             File ks = file("release.jks")
             if (!ks.exists()) {
-                ["keytool", "-genkey", "-v", "-keystore", ks.absolutePath, "-keyalg", "RSA", "-keysize", "2048", "-validity", "10000", "-alias", "sahil", "-storepass", "sahil123", "-keypass", "sahil123", "-dname", "CN=Sahil Ansari, O=MarbleRippleFix, C=IN"].execute().waitFor()
+                ["keytool", "-genkey", "-v", "-keystore", ks.absolutePath, "-keyalg", "RSA", "-keysize", "2048", "-validity", "10000", "-alias", "sahil", "-storepass", "sahil123", "-keypass", "sahil123", "-dname", "CN=Sahil Ansari, O=EvoTempFix, C=IN"].execute().waitFor()
             }
             storeFile ks
             storePassword "sahil123"
