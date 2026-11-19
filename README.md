@@ -1,22 +1,40 @@
-# 🌊 Marble Ripple animation Fix (v2.8)
+# EvoTempFix
 
-> **📌 Note:** I created this module as a **temporary fix** specifically for **Evolution X 12.3** on **POCO F5 / Redmi Note 12 Turbo (`marble`)**, where the biometric unlock ripple animation was broken after the ROM switched to the Stock Xiaomi Fingerprint HAL.
+A lightweight Xposed / LSPosed module providing temporary SystemUI fixes for **Evolution X 12.3** on **POCO F5 (`marble`)** until official ROM updates resolve them upstream.
 
 ---
 
-## 🔍 Root Cause in Evolution X 12.3
-1. `AuthRippleView` remains stuck in `View.GONE` state with `0,0-0,0` layout bounds.
-2. The Stock FP HAL wake-and-unlock path bypasses SystemUI's standard `AuthRippleController` trigger, even though sensor coordinates (`Point(1080, 1025)`) are present.
+## Current Fixes (`v2.8`)
 
-## ✨ What's New in v2.8
-- **Zero-Lag Reflection Caching:** Pre-caches `AuthRippleController` methods & `BiometricSourceType` at SystemUI startup instead of scanning on every unlock.
-- **Dynamic DisplayMetrics Bounds:** Automatically reads screen width/height instead of relying solely on hardcoded dimensions.
-- **450ms Debounce Guard:** Prevents duplicate ripple triggers.
+* **Biometric Unlock Ripple Animation:** Restores the side-mounted fingerprint unlock ripple effect in `com.android.systemui` by overriding the uninitialized `(0, 0)` sensor coordinate with `Point(1080, 1025)`, forcing proper view bounds layout on `AuthRippleView`, and triggering `AuthRippleController` directly on `KeyguardUpdateMonitor.onFingerprintAuthenticated`.
 
-## 📦 Installation
-1. Download and install **`EvoTempFix-v2.8.apk`** from [Releases](../../releases).
-2. Enable the module in **Vector / LSPosed** (Scope: `System UI`).
-3. Restart SystemUI (`su -c "killall com.android.systemui"`).
+---
 
-## 👤 Author
-- **Sahil Ansari** — [@imsahilansarii](https://t.me/imsahilansarii)
+## Requirements
+
+* **Device:** POCO F5 (`marble`)
+* **ROM:** Evolution X 12.3 (Android 16)
+* **Framework:** LSPosed (Zygisk / KernelSU / KSU Next)
+
+---
+
+## Installation
+
+1. Download the latest `EvoTempFix-v2.8.apk` from the [Releases](../../releases) page.
+2. Install the APK on your device.
+3. Open **LSPosed Manager** → **Modules** → Enable **EvoTempFix**.
+4. Ensure **System UI (`com.android.systemui`)** is checked in the module scope.
+5. Restart SystemUI (`su -c "killall com.android.systemui"`) or reboot your device.
+
+---
+
+## Branches
+
+* `master` — Stable, verified fixes ready for daily use.
+* `dev` — Experimental branch for testing upcoming Evolution X workarounds.
+
+---
+
+## Author
+
+* **Sahil Ansari** — [@imsahilansarii](https://t.me/imsahilansarii)
