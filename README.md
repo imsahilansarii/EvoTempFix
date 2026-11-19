@@ -4,7 +4,7 @@ A lightweight Xposed / LSPosed module providing temporary SystemUI fixes for **E
 
 ---
 
-## Current Fixes (`v2.8`)
+## Current Fixes (`v2.9`)
 
 * **Biometric Unlock Ripple Animation:** Restores the side-mounted fingerprint unlock ripple effect in `com.android.systemui` by overriding the uninitialized `(0, 0)` sensor coordinate with `Point(1080, 1025)`, forcing proper view bounds layout on `AuthRippleView`, and triggering `AuthRippleController` directly on `KeyguardUpdateMonitor.onFingerprintAuthenticated`.
 
@@ -20,7 +20,7 @@ A lightweight Xposed / LSPosed module providing temporary SystemUI fixes for **E
 
 ## Installation
 
-1. Download the latest `EvoTempFix-v2.8.apk` from the [Releases](../../releases) page.
+1. Download the latest `EvoTempFix-v2.9.apk` from the [Releases](../../releases) page.
 2. Install the APK on your device.
 3. Open **LSPosed Manager** → **Modules** → Enable **EvoTempFix**.
 4. Ensure **System UI (`com.android.systemui`)** is checked in the module scope.
