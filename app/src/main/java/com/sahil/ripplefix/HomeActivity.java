@@ -33,7 +33,6 @@ public class HomeActivity extends Activity {
 
     public static final String PREFS_NAME = "evotempfix_prefs";
     public static final String KEY_FP_RIPPLE = "fix_fingerprint_ripple";
-    public static final String KEY_SCROLL_CAPTURE_FIX = "fix_scroll_capture_overlap";
 
     private SharedPreferences prefs;
     private boolean isModuleActive = true;
@@ -92,7 +91,6 @@ public class HomeActivity extends Activity {
         root.setBackgroundColor(bgColor);
         root.setFitsSystemWindows(true);
 
-        // Elevated Material You Top App Bar with Shadow
         LinearLayout appBar = new LinearLayout(this);
         appBar.setOrientation(LinearLayout.HORIZONTAL);
         appBar.setGravity(Gravity.CENTER_VERTICAL);
@@ -176,27 +174,6 @@ public class HomeActivity extends Activity {
                 "Fingerprint unlock ripple",
                 "Restore side-mounted fingerprint sensor ripple animation on Evolution X lockscreen.",
                 KEY_FP_RIPPLE,
-                true,
-                textPrimary,
-                textSecondary,
-                accentColor,
-                onAccentColor,
-                outlineColor,
-                rippleColor,
-                isNight
-        ));
-
-        View divider = new View(this);
-        divider.setBackgroundColor(adjustAlpha(outlineColor, 0.35f));
-        LinearLayout.LayoutParams divLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
-        divLp.setMargins(dp(20), 0, dp(20), 0);
-        card.addView(divider, divLp);
-
-        card.addView(createMaterialToggleRow(
-                "Fix scrolling screenshot overlap",
-                "Trim floating bottom navigation bar overlap from stitched tiles in Compose apps.",
-                KEY_SCROLL_CAPTURE_FIX,
                 true,
                 textPrimary,
                 textSecondary,

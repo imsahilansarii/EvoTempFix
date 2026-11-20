@@ -1,14 +1,10 @@
 package com.sahil.ripplefix;
 
-import android.content.res.Resources;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.RenderNode;
 import android.util.DisplayMetrics;
 import android.view.View;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
@@ -42,73 +38,6 @@ public class MainHook implements IXposedHookLoadPackage {
         if (isFixEnabled(HomeActivity.KEY_FP_RIPPLE, true)) {
             hookRippleFix(lpparam.classLoader);
         }
-
-        if (isFixEnabled(HomeActivity.KEY_SCROLL_CAPTURE_FIX, true)) {
-            hookScrollCaptureOverlapFix(lpparam.classLoader);
-        }
-    }
-
-    private void hookScrollCaptureOverlapFix(ClassLoader cl) {
-        Class<?> drawableClass = XposedHelpers.findClassIfExists(
-                "com.android.systemui.screenshot.scroll.TiledImageDrawable", cl);
-        if (drawableClass == null) return;
-
-        XposedBridge.hookAllMethods(drawableClass, "draw", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object drawable = param.thisObject;
-                Object tileSet = XposedHelpers.getObjectField(drawable, "mTiles");
-                if (tileSet == null) return;
-
-                List<?> tiles = (List<?>) XposedHelpers.getObjectField(tileSet, "mTiles");
-                if (tiles == null || tiles.size() <= 1) return;
-
-                float density = Resources.getSystem().getDisplayMetrics().density;
-                int trimPx = Math.round(108f * density);
-
-                // Clip bottom bar on all intermediate tiles (0 .. size-2), keep final tile untouched
-                for (int i = 0; i < tiles.size() - 1; i++) {
-                    Object tile = tiles.get(i);
-                    if (tile == null) continue;
-                    Rect loc = (Rect) XposedHelpers.getObjectField(tile, "mLocation");
-                    RenderNode node = (RenderNode) XposedHelpers.getObjectField(tile, "mNode");
-                    if (loc != null && node != null && loc.height() > trimPx * 2) {
-                        node.setClipToBounds(true);
-                        node.setPosition(0, 0, loc.width(), loc.height() - trimPx);
-                    }
-                }
-            }
-
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                Object drawable = param.thisObject;
-                Object tileSet = XposedHelpers.getObjectField(drawable, "mTiles");
-                if (tileSet == null) return;
-
-                List<?> tiles = (List<?>) XposedHelpers.getObjectField(tileSet, "mTiles");
-                if (tiles == null || tiles.size() <= 1) return;
-
-                float density = Resources.getSystem().getDisplayMetrics().density;
-                int trimPx = Math.round(108f * density);
-
-                // Ensure newly created RenderNodes on first draw pass also get clipped
-                for (int i = 0; i < tiles.size() - 1; i++) {
-                    Object tile = tiles.get(i);
-                    if (tile == null) continue;
-                    Rect loc = (Rect) XposedHelpers.getObjectField(tile, "mLocation");
-                    RenderNode node = (RenderNode) XposedHelpers.getObjectField(tile, "mNode");
-                    if (loc != null && node != null && loc.height() > trimPx * 2) {
-                        int targetH = loc.height() - trimPx;
-                        if (node.getHeight() != targetH) {
-                            node.setClipToBounds(true);
-                            node.setPosition(0, 0, loc.width(), targetH);
-                            RenderNode rootNode = (RenderNode) XposedHelpers.getObjectField(drawable, "mNode");
-                            if (rootNode != null) rootNode.discardDisplayList();
-                        }
-                    }
-                }
-            }
-        });
     }
 
     private void hookRippleFix(ClassLoader cl) {
