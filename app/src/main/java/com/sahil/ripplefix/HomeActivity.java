@@ -33,6 +33,7 @@ public class HomeActivity extends Activity {
 
     public static final String PREFS_NAME = "evotempfix_prefs";
     public static final String KEY_FP_RIPPLE = "fix_fingerprint_ripple";
+    public static final String KEY_SCROLL_CAPTURE_FIX = "fix_scroll_capture_overlap";
 
     private SharedPreferences prefs;
     private boolean isModuleActive = true;
@@ -52,7 +53,6 @@ public class HomeActivity extends Activity {
         boolean isNight = (getResources().getConfiguration().uiMode
                 & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
 
-        // Material You Tonal Palette
         int bgColor = getColor(isNight
                 ? android.R.color.system_neutral1_900
                 : android.R.color.system_neutral1_50);
@@ -110,7 +110,6 @@ public class HomeActivity extends Activity {
                 0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
         appBar.addView(titleView, titleLp);
 
-        // Circular Material ripple button for 3-dot menu
         FrameLayout menuBtn = new FrameLayout(this);
         GradientDrawable circleMask = new GradientDrawable();
         circleMask.setShape(GradientDrawable.OVAL);
@@ -129,7 +128,6 @@ public class HomeActivity extends Activity {
 
         root.addView(appBar);
 
-        // Scrollable Material Body
         ScrollView scrollView = new ScrollView(this);
         scrollView.setClipToPadding(false);
 
@@ -137,7 +135,6 @@ public class HomeActivity extends Activity {
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(16), dp(16), dp(28));
 
-        // Warning Card if LSPosed XSharedPreferences is not active
         if (!isModuleActive) {
             TextView warn = new TextView(this);
             warn.setText("Module inactive in LSPosed. Enable EvoTempFix and reboot to sync toggles.");
@@ -157,7 +154,6 @@ public class HomeActivity extends Activity {
             content.addView(warn, warnLp);
         }
 
-        // Material Section Label
         TextView sectionLabel = new TextView(this);
         sectionLabel.setText("SystemUI");
         sectionLabel.setTextColor(accentColor);
@@ -166,7 +162,6 @@ public class HomeActivity extends Activity {
         sectionLabel.setPadding(dp(8), dp(2), dp(8), dp(10));
         content.addView(sectionLabel);
 
-        // Material 3 Rounded Card Container
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         GradientDrawable cardBg = new GradientDrawable();
@@ -181,6 +176,27 @@ public class HomeActivity extends Activity {
                 "Fingerprint unlock ripple",
                 "Restore side-mounted fingerprint sensor ripple animation on Evolution X lockscreen.",
                 KEY_FP_RIPPLE,
+                true,
+                textPrimary,
+                textSecondary,
+                accentColor,
+                onAccentColor,
+                outlineColor,
+                rippleColor,
+                isNight
+        ));
+
+        View divider = new View(this);
+        divider.setBackgroundColor(adjustAlpha(outlineColor, 0.35f));
+        LinearLayout.LayoutParams divLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+        divLp.setMargins(dp(20), 0, dp(20), 0);
+        card.addView(divider, divLp);
+
+        card.addView(createMaterialToggleRow(
+                "Fix scrolling screenshot overlap",
+                "Trim floating bottom navigation bar overlap from stitched tiles in Compose apps.",
+                KEY_SCROLL_CAPTURE_FIX,
                 true,
                 textPrimary,
                 textSecondary,
@@ -267,15 +283,15 @@ public class HomeActivity extends Activity {
             boolean newState = !m3Switch.isChecked();
             m3Switch.setChecked(newState, true);
             prefs.edit().putBoolean(prefKey, newState).apply();
+            Toast.makeText(this, "Restart SystemUI from menu to apply", Toast.LENGTH_SHORT).show();
         });
 
         return row;
     }
 
-    // Custom Material 3 Pill Switch View (52dp x 32dp)
     private static class Material3Switch extends View {
         private boolean checked;
-        private float progress; // 0f = off, 1f = on
+        private float progress;
         private final int trackOnColor;
         private final int thumbOnColor;
         private final int trackOffColor;
@@ -330,12 +346,10 @@ public class HomeActivity extends Activity {
 
             trackRect.set(stroke / 2f, stroke / 2f, w - stroke / 2f, h - stroke / 2f);
 
-            // Track Fill
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(blendColor(trackOffColor, trackOnColor, progress));
             canvas.drawRoundRect(trackRect, radius, radius, paint);
 
-            // Track Outline when OFF
             if (progress < 1f) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(stroke);
@@ -345,7 +359,6 @@ public class HomeActivity extends Activity {
                 canvas.drawRoundRect(trackRect, radius, radius, paint);
             }
 
-            // Thumb (scales from 16dp off -> 24dp on)
             float thumbRadiusOff = 8f * density;
             float thumbRadiusOn = 12f * density;
             float thumbRadius = thumbRadiusOff + (thumbRadiusOn - thumbRadiusOff) * progress;

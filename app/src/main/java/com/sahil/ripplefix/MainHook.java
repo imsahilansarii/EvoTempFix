@@ -1,6 +1,8 @@
 package com.sahil.ripplefix;
 
+import android.content.res.Resources;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.View;
 import java.lang.reflect.Field;
@@ -38,6 +40,34 @@ public class MainHook implements IXposedHookLoadPackage {
         if (isFixEnabled(HomeActivity.KEY_FP_RIPPLE, true)) {
             hookRippleFix(lpparam.classLoader);
         }
+
+        if (isFixEnabled(HomeActivity.KEY_SCROLL_CAPTURE_FIX, true)) {
+            hookScrollCaptureOverlapFix(lpparam.classLoader);
+        }
+    }
+
+    private void hookScrollCaptureOverlapFix(ClassLoader cl) {
+        Class<?> tileSetClass = XposedHelpers.findClassIfExists(
+                "com.android.systemui.screenshot.scroll.ImageTileSet", cl);
+        if (tileSetClass == null) return;
+
+        XposedBridge.hookAllMethods(tileSetClass, "addTile", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                if (param.args == null || param.args.length == 0 || param.args[0] == null) return;
+                Object imageTile = param.args[0];
+                Rect location = (Rect) XposedHelpers.getObjectField(imageTile, "mLocation");
+                if (location == null) return;
+
+                float density = Resources.getSystem().getDisplayMetrics().density;
+                int trimPx = Math.round(108f * density);
+
+                // Only trim when the captured tile is tall enough so short end-tiles stay intact
+                if (location.height() > trimPx * 2) {
+                    location.bottom -= trimPx;
+                }
+            }
+        });
     }
 
     private void hookRippleFix(ClassLoader cl) {
